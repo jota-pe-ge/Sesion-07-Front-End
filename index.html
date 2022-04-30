@@ -76,22 +76,30 @@
                 <!--Otros-->
                 <div class="accordion-item rounded-0">
                     <h2 class="accordion-header" id="headingFour">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">Otro dato</button>
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">Vivos y muertos</button>
                     </h2>
                     <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
                         <div class="accordion-body text-black-50">
-                            <p>Define otro dato.</p>
+                            <p>
+                                De lo que sobrevivieron al accidente, podemos encontrar un total de <span id="total_vivos"></span>, mientras que aquellos que fallecieron (y que en paz descansen) son un total de
+                                <span id="total_muertos"></span>
+                            </p>
+                            <canvas id="supervivencia" width="100" height="100" class="m-5"></canvas>
                         </div>
                     </div>
                 </div>
                 <!--Otro más-->
                 <div class="accordion-item rounded-0">
                     <h2 class="accordion-header" id="headingFive">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">Otro dato más</button>
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">Sobrevivientes por clase</button>
                     </h2>
                     <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
                         <div class="accordion-body text-black-50">
-                            <p>Define otro dato más.</p>
+                            <p>
+                                De acuerdo a las personas que sobrevivieron, <span id="total_vivos_primera"></span> pertenecen a la primera clase, <span id="total_vivos_segunda"></span> son de la segunda y
+                                <span id="total_vivos_tercera"></span> son de la tercera.
+                            </p>
+                            <canvas id="supervivencia_clasista" width="100" height="100" class="m-5"></canvas>
                         </div>
                     </div>
                 </div>
@@ -146,6 +154,12 @@
                 var cuantosPrimera = 0;
                 var cuantosSegunda = 0;
                 var cuantosTercera = 0;
+                var vivos = 0;
+                var muertos = 0;
+                var vivosprimera = 0;
+                var vivossegunda = 0;
+                var vivostercera = 0;
+
                 //consultando en cada elemento del arreglo
                 data.forEach((d) => {
                     //después
@@ -163,6 +177,20 @@
                         cuantosSegunda = cuantosSegunda + 1;
                     } else {
                         cuantosTercera = cuantosTercera + 1;
+                    }
+
+                    if (d.Survived == 0) {
+                        muertos = muertos + 1;
+                    } else if (d.Survived == 1) {
+                        vivos = vivos + 1;
+                    }
+
+                    if (d.Survived == 1 && d.Pclass == 1) {
+                        vivosprimera = vivosprimera + 1;
+                    } else if (d.Survived == 1 && d.Pclass == 2) {
+                        vivossegunda = vivossegunda + 1;
+                    } else if (d.Survived == 1 && d.Pclass == 3) {
+                        vivostercera = vivostercera + 1;
                     }
                 });
                 //veamos las edades en la consola
@@ -185,30 +213,35 @@
                 document.querySelector("#desegunda").innerHTML = cuantosSegunda;
                 document.querySelector("#detercera").innerHTML = cuantosTercera;
 
-                //saqueos datos para graficar edades
+                document.querySelector("#total_vivos").innerHTML = vivos;
+                document.querySelector("#total_muertos").innerHTML = muertos;
+
+                document.querySelector("#total_vivos_primera").innerHTML = vivosprimera;
+                document.querySelector("#total_vivos_segunda").innerHTML = vivossegunda;
+                document.querySelector("#total_vivos_tercera").innerHTML = vivostercera;
+
+                //saquemos datos para graficar edades
                 var menores = [];
                 var medianos = [];
                 var maduros = [];
                 var mayores = [];
 
-                edadesreales.forEach(e => {
-                    if ( e < 18) {
-                      menores.push(e);
+                edadesreales.forEach((e) => {
+                    if (e < 18) {
+                        menores.push(e);
                     } else if (e > 18 && e < 41) {
-                      medianos.push(e);
+                        medianos.push(e);
                     } else if (e > 40 && e < 60) {
-                      maduros.push(e);
+                        maduros.push(e);
                     } else {
-                      mayores.push(e);
+                        mayores.push(e);
                     }
-              });
+                });
 
                 console.log(menores.length);
                 console.log(medianos.length);
                 console.log(maduros.length);
                 console.log(mayores.length);
-
-
 
                 /*
                     Los demás datos deben ser propustos por ustedes.
@@ -217,24 +250,38 @@
                 */
 
                 new Chart(document.getElementById("edadista").getContext("2d"), {
-                    type: "pie",
+                    type: "doughnut",
                     data: {
                         labels: ["Menores de edad", "Adultos jóvenes", "Adultos", "Adultos mayores"],
-                        datasets: [{ data: [menores.length, medianos.length, maduros.length, mayores.length], label: "Edades en el Titanic", backgroundColor: ["#ff0", "#f00", "#0f0", "#0ff"] }],
+                        datasets: [{ data: [menores.length, medianos.length, maduros.length, mayores.length], label: "Edades en el Titanic", backgroundColor: ["#f6eff7", "#bdc9e1", "#67a9cf", "#02818a"] }],
                     },
                 });
                 new Chart(document.getElementById("sexista").getContext("2d"), {
                     type: "pie",
                     data: {
                         labels: ["Hombres", "Mujeres"],
-                        datasets: [{ data: [hombres, mujeres], label: "Sexo en el Titanic", backgroundColor: ["#ff0", "#f00"] }],
+                        datasets: [{ data: [hombres, mujeres], label: "Sexo en el Titanic", backgroundColor: ["#2ca25f", "#99d8c9"] }],
                     },
                 });
                 new Chart(document.getElementById("clasista").getContext("2d"), {
-                    type: "pie",
+                    type: "doughnut",
                     data: {
                         labels: ["Primera clase", "Segunda clase", "Tercera clase"],
-                        datasets: [{ data: [cuantosPrimera, cuantosSegunda, cuantosTercera], label: "Clases en el Titanic", backgroundColor: ["#ff0", "#f00", "#0f0"] }],
+                        datasets: [{ data: [cuantosPrimera, cuantosSegunda, cuantosTercera], label: "Clases en el Titanic", backgroundColor: ["#fff7bc", "#fec44f", "#d95f0e"] }],
+                    },
+                });
+                new Chart(document.getElementById("supervivencia").getContext("2d"), {
+                    type: "bar",
+                    data: {
+                        labels: ["Vivos", "Muertos"],
+                        datasets: [{ data: [vivos, muertos], label: "Supervivencia en el Titanic", backgroundColor: ["#f0f0f0", "#252525"] }],
+                    },
+                });
+                new Chart(document.getElementById("supervivencia_clasista").getContext("2d"), {
+                    type: "bar",
+                    data: {
+                        labels: ["Vivos primera clase", "Vivos segunda clase", "Vivos tercera clase"],
+                        datasets: [{ data: [vivosprimera, vivossegunda, vivostercera], label: "Supervivencia de clase en el Titanic", backgroundColor: ["#756bb1", "#bcbddc", "#efedf5"] }],
                     },
                 });
             }
